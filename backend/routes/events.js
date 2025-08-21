@@ -1,10 +1,7 @@
 const express = require('express');
 const Event = require('../models/Event');
-const User = require('../models/User');
 const auth = require('../middleware/auth');
 const adminAuth = require('../middleware/adminAuth');
-const validation = require('../middleware/validation');
-const { eventSchemas } = require('../validation/schemas');
 
 const router = express.Router();
 
@@ -31,7 +28,7 @@ router.get('/', async (req, res) => {
 });
 
 // Create event (admin only)
-router.post('/', auth, adminAuth, validation(eventSchemas.create), async (req, res) => {
+router.post('/', auth, adminAuth, async (req, res) => {
   try {
     const event = new Event(req.body);
     await event.save();
@@ -82,7 +79,7 @@ router.post('/:eventId/register', auth, async (req, res) => {
 });
 
 // Update event results (admin only)
-router.patch('/:eventId/results', auth, adminAuth, validation(eventSchemas.updateResults), async (req, res) => {
+router.patch('/:eventId/results', auth, adminAuth, async (req, res) => {
   try {
     const { eventId } = req.params;
     const { results } = req.body;

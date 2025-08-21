@@ -2,13 +2,11 @@ const express = require('express');
 const Booking = require('../models/Booking');
 const User = require('../models/User');
 const auth = require('../middleware/auth');
-const validation = require('../middleware/validation');
-const { bookingSchemas } = require('../validation/schemas');
 
 const router = express.Router();
 
 // Create booking
-router.post('/', auth, validation(bookingSchemas.create), async (req, res) => {
+router.post('/', auth, async (req, res) => {
   try {
     const {
       simulator,
@@ -80,21 +78,16 @@ router.get('/my-bookings', auth, async (req, res) => {
   }
 });
 
-// Update booking status
-router.patch('/:bookingId/status', auth, validation(bookingSchemas.updateStatus), async (req, res) => {
+// Update booking status (for payment completion)
+router.patch('/:bookingId/status', auth, async (req, res) => {
   try {
     const { bookingId } = req.params;
-    const { status } = req.body;
-
-    // Validate bookingId format
-    if (!bookingId.match(/^[0-9a-fA-F]{24}$/)) {
-      return res.status(400).json({ error: 'Invalid booking ID format' });
-    }
+    const { paymentStatus, status } = req.body;
 
     const booking = await Booking.findOneAndUpdate(
       { _id: bookingId, user: req.user.userId },
-      { status },
-      { new: true, runValidators: true }
+      { paymentStatus, status },
+      { new: true }
     ).populate('user', 'email');
 
     if (!booking) {

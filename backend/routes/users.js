@@ -1,42 +1,34 @@
 const express = require('express');
 const User = require('../models/User');
 const auth = require('../middleware/auth');
-const validation = require('../middleware/validation');
-const { userSchemas } = require('../validation/schemas');
 
 const router = express.Router();
 
-// Search users - SECURED: Input validation and NoSQL injection prevention
-router.get('/search', auth, validation(userSchemas.search), async (req, res) => {
+// Search users
+router.get('/search', auth, async (req, res) => {
   try {
-    const { search, page = 1, limit = 10 } = req.query;
+    const { query } = req.query;
     
-    let query = {};
-    if (search) {
-      // Escape special regex characters to prevent NoSQL injection
-      const escapedSearch = search.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-      query.email = { $regex: escapedSearch, $options: 'i' };
+    if (!query || query.length < 2) {
+      return res.json([]);
     }
 
-    // Ensure current user is excluded from query
-    query._id = { $ne: req.user.userId };
-
-    const users = await User.find(query)
-      .select('email licenses hoursDriven')
-      .limit(limit * 1)
-      .skip((page - 1) * limit)
-      .sort({ email: 1 })
-      .lean(); // Use lean() for better performance
+    const users = await User.find({
+      email: { $regex: query, $options: 'i' },
+      _id: { $ne: req.user.userId } // Exclude current user
+    })
+    .select('email licenses hoursDriven')
+    .limit(10);
 
     res.json(users);
   } catch (error) {
-    console.error('Search users error:', error);
-    res.status(500).json({ error: 'Failed to search users' });
+    console.error('User search error:', error);
+    res.status(500).json({ error: 'Search failed' });
   }
 });
 
 // Add friend
-router.post('/friends/:userId', auth, validation(userSchemas.addFriend), async (req, res) => {
+router.post('/friends/:userId', auth, async (req, res) => {
   try {
     const { userId } = req.params;
     const currentUser = await User.findById(req.user.userId);

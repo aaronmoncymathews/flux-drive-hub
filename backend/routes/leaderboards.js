@@ -1,11 +1,11 @@
 const express = require('express');
 const User = require('../models/User');
-const auth = require('../middleware/auth');
+const Booking = require('../models/Booking');
 
 const router = express.Router();
 
-// Get leaderboards - SECURED: Now requires authentication
-router.get('/:type', auth, async (req, res) => {
+// Get leaderboards
+router.get('/:type', async (req, res) => {
   try {
     const { type } = req.params;
     const { sim, category, timeframe } = req.query;

@@ -2,18 +2,11 @@ const express = require('express');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const auth = require('../middleware/auth');
-const validation = require('../middleware/validation');
-const { authSchemas } = require('../validation/schemas');
-const { createRateLimiter } = require('../middleware/security');
 
 const router = express.Router();
 
-// Rate limiting for auth endpoints
-const authLimiter = createRateLimiter(15 * 60 * 1000, 5); // 5 attempts per 15 minutes
-const loginLimiter = createRateLimiter(15 * 60 * 1000, 3); // 3 attempts per 15 minutes
-
 // Register
-router.post('/register', authLimiter, validation(authSchemas.register), async (req, res) => {
+router.post('/register', async (req, res) => {
   try {
     const { email, password } = req.body;
 
@@ -52,7 +45,7 @@ router.post('/register', authLimiter, validation(authSchemas.register), async (r
 });
 
 // Login
-router.post('/login', loginLimiter, validation(authSchemas.login), async (req, res) => {
+router.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body;
 
@@ -92,7 +85,7 @@ router.post('/login', loginLimiter, validation(authSchemas.login), async (req, r
   }
 });
 
-// Get current user - requires authentication
+// Get current user
 router.get('/me', auth, async (req, res) => {
   try {
     const user = await User.findById(req.user.userId).populate('friends', 'email licenses hoursDriven');
