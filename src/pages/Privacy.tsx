@@ -48,7 +48,7 @@ const Privacy = () => {
               <p>If you have questions about this Privacy Policy, please contact us at:</p>
               <p className="mt-2">
                 <strong>Email:</strong> privacy@fluxterrasimworks.com<br />
-                <strong>Address:</strong> Austin, TX, United States
+                <strong>Address:</strong> Startups Valley TBI Amal Jyothi, Amal Jyothi College of Engineering Kanjirappally, Koovappally P. O, Kerala 686518
               </p>
             </CardContent>
           </Card>
