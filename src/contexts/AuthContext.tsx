@@ -57,8 +57,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const login = async (email: string, password: string): Promise<boolean> => {
     try {
-      // In production, replace with actual API call
-      const response = await fetch('/api/login', {
+      const response = await fetch('/api/auth/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -74,45 +73,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       }
       return false;
     } catch (error) {
-      // Mock authentication for demo purposes
-      if (email === 'admin@fluxterrasimworks.com' && password === 'admin123') {
-        const mockUser: User = {
-          id: '1',
-          email,
-          licenses: [],
-          hoursDriven: 150,
-          friends: [],
-          role: 'admin'
-        };
-        const mockToken = btoa(JSON.stringify(mockUser));
-        localStorage.setItem('auth_token', mockToken);
-        setUser(mockUser);
-        return true;
-      }
-      if (email === 'user@example.com' && password === 'user123') {
-        const mockUser: User = {
-          id: '2',
-          email,
-          licenses: [
-            { sim: 'ACC', category: 'GT3', track: 'Monza', earned: '2024-01-15' }
-          ],
-          hoursDriven: 50,
-          friends: [],
-          role: 'user'
-        };
-        const mockToken = btoa(JSON.stringify(mockUser));
-        localStorage.setItem('auth_token', mockToken);
-        setUser(mockUser);
-        return true;
-      }
+      console.error('Login failed:', error);
       return false;
     }
   };
 
   const register = async (email: string, password: string): Promise<boolean> => {
     try {
-      // In production, replace with actual API call
-      const response = await fetch('/api/register', {
+      const response = await fetch('/api/auth/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -128,19 +96,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       }
       return false;
     } catch (error) {
-      // Mock registration for demo purposes
-      const mockUser: User = {
-        id: Date.now().toString(),
-        email,
-        licenses: [],
-        hoursDriven: 0,
-        friends: [],
-        role: 'user'
-      };
-      const mockToken = btoa(JSON.stringify(mockUser));
-      localStorage.setItem('auth_token', mockToken);
-      setUser(mockUser);
-      return true;
+      console.error('Registration failed:', error);
+      return false;
     }
   };
 
